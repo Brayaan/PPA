@@ -4,42 +4,64 @@ using UnityEngine;
 using UnityEngine.TestTools;
 
 /// <summary>
-/// Pruebas PlayMode para EnemyHealthSystem.
-/// Cada prueba crea su propio GameObject con todos los componentes necesarios
-/// y lo destruye en TearDown (o verifica que Die() lo destruya a tiempo).
-///
-/// EnemyHealthSystem no accede a referencias de Inspector en Start(),
-/// por lo que no se generan Debug.LogError esperados salvo en casos indicados.
-/// Los Debug.Log informativos ("Enemigo vida: X", "Enemigo derrotado") son
-/// de nivel Log, no Error, y no rompen las pruebas por sí solos.
+/// TEST SUITE: EnemyHealthSystem
+/// 
+/// PROPÓSITO:
+/// Validar el sistema de vida de los enemigos, incluyendo:
+/// - Aplicación de daño
+/// - Límites de vida (no menor a 0)
+/// - Knockback al recibir daño
+/// - Hit-stun (inmunidad temporal)
+/// - Muerte del enemigo cuando la vida llega a 0
+/// 
+/// USO:
+/// Estas pruebas simulan enemigos en runtime y verifican su comportamiento
+/// sin necesidad de escena Unity.
+/// 
+/// DEPENDENCIAS:
+/// - Rigidbody2D (para knockback físico)
+/// - Unity Physics2D (FixedUpdate)
+/// - Destrucción de GameObjects (Destroy)
 /// </summary>
 public class EnemyHealthSystemTests
 {
-    // GameObject del enemigo; se crea antes de cada prueba y se destruye en TearDown.
+    // =========================
+    // REFERENCIA DEL ENEMIGO
+    // =========================
     private GameObject _enemyGO;
 
-    // -------------------------------------------------------------------------
-    // Helper: crea un GameObject con los componentes mínimos requeridos por
-    // EnemyHealthSystem. Se desactiva la gravedad para resultados deterministas.
-    // -------------------------------------------------------------------------
+    // =========================
+    // HELPER: CREACIÓN DE ENEMIGO
+    // =========================
+    /// <summary>
+    /// Crea un enemigo simulado con:
+    /// - Rigidbody2D sin gravedad (controlado)
+    /// - EnemyHealthSystem con knockback configurado
+    /// 
+    /// USO:
+    /// Permite generar enemigos consistentes para todas las pruebas.
+    /// </summary>
     private EnemyHealthSystem CreateEnemy(Vector3 position = default)
     {
         _enemyGO = new GameObject("TestEnemy");
         _enemyGO.transform.position = position;
 
-        // Rigidbody2D — requerido por ApplyHit para aplicar la fuerza de knockback
         Rigidbody2D rb = _enemyGO.AddComponent<Rigidbody2D>();
-        rb.gravityScale = 0f; // desactivar gravedad para resultados deterministas
+        rb.gravityScale = 0f;
 
-        // EnemyHealthSystem — componente bajo prueba
         EnemyHealthSystem health = _enemyGO.AddComponent<EnemyHealthSystem>();
-        health.knockbackDuration = 0.1f; // duración corta para mantener la suite rápida
+        health.knockbackDuration = 0.1f;
 
         return health;
     }
 
-    // Destruir el GameObject después de cada prueba.
-    // Si Die() ya lo destruyó, la referencia puede ser null; Object.Destroy lo tolera.
+    // =========================
+    // TEARDOWN (LIMPIEZA)
+    // =========================
+    /// <summary>
+    /// Se ejecuta después de cada test.
+    /// Elimina el enemigo creado para evitar contaminación entre pruebas.
+    /// </summary>
     [TearDown]
     public void TearDown()
     {
@@ -47,77 +69,87 @@ public class EnemyHealthSystemTests
             Object.Destroy(_enemyGO);
     }
 
-    // =========================================================================
-    // 1. Al recibir daño la vida baja correctamente
-    // =========================================================================
+    // =========================
+    // TEST 1: DAÑO NORMAL
+    // =========================
+    /// <summary>
+    /// Verifica que el enemigo pierde vida correctamente
+    /// cuando recibe daño.
+    /// </summary>
     [UnityTest]
     public IEnumerator TakeDamage_ReducesHealthByDamageAmount()
     {
         EnemyHealthSystem health = CreateEnemy();
-
-        // Esperar un frame para que Start() inicialice currentHealth
         yield return null;
 
-        int initialHealth = health.currentHealth; // igual a maxHealth tras Start()
+        int initialHealth = health.currentHealth;
         int damage = 15;
-        Vector2 attackerPos = new Vector2(_enemyGO.transform.position.x - 1f,
-                                          _enemyGO.transform.position.y);
+
+        // Posición del atacante (a la izquierda del enemigo)
+        Vector2 attackerPos = new Vector2(
+            _enemyGO.transform.position.x - 1f,
+            _enemyGO.transform.position.y
+        );
 
         health.TakeDamage(damage, attackerPos);
 
-        Assert.AreEqual(initialHealth - damage, health.currentHealth,
-            "La vida del enemigo debe bajar exactamente en la cantidad de daño recibido.");
+        Assert.AreEqual(initialHealth - damage, health.currentHealth);
     }
 
-    // =========================================================================
-    // 2. La vida no baja de 0
-    // =========================================================================
+    // =========================
+    // TEST 2: VIDA MÍNIMA
+    // =========================
+    /// <summary>
+    /// Verifica que la vida nunca baja de 0,
+    /// incluso si el daño es mayor que la vida actual.
+    /// </summary>
     [UnityTest]
     public IEnumerator TakeDamage_HealthDoesNotGoBelowZero()
     {
         EnemyHealthSystem health = CreateEnemy();
         yield return null;
 
-        Vector2 attackerPos = new Vector2(_enemyGO.transform.position.x - 1f,
-                                          _enemyGO.transform.position.y);
+        Vector2 attackerPos = new Vector2(
+            _enemyGO.transform.position.x - 1f,
+            _enemyGO.transform.position.y
+        );
 
-        // Aplicar más daño del que tiene el enemigo
         health.TakeDamage(health.maxHealth + 100, attackerPos);
 
-        Assert.AreEqual(0, health.currentHealth,
-            "La vida del enemigo no debe ser menor que cero aunque el daño sea excesivo.");
+        Assert.AreEqual(0, health.currentHealth);
     }
 
-    // =========================================================================
-    // 3. El knockback empuja en la dirección correcta
-    //    El impulso debe alejar al enemigo del atacante.
-    // =========================================================================
+    // =========================
+    // TEST 3: KNOCKBACK
+    // =========================
+    /// <summary>
+    /// Verifica que el enemigo es empujado en dirección opuesta
+    /// al atacante cuando recibe daño.
+    /// </summary>
     [UnityTest]
     public IEnumerator TakeDamage_KnockbackPushesAwayFromAttacker()
     {
-        // Colocar al enemigo en el origen
         EnemyHealthSystem health = CreateEnemy(Vector3.zero);
         yield return null;
 
-        // El atacante está a la izquierda → el empuje debe ir hacia la derecha
         Vector2 attackerPos = new Vector2(-2f, 0f);
+
         health.TakeDamage(10, attackerPos);
 
-        // Esperar un FixedUpdate para que AddForce se aplique al Rigidbody2D
         yield return new WaitForFixedUpdate();
 
         Rigidbody2D rb = _enemyGO.GetComponent<Rigidbody2D>();
 
-        // La componente X de la velocidad debe ser positiva (hacia la derecha)
-        Assert.Greater(rb.linearVelocity.x, 0f,
-            "El knockback debe empujar al enemigo en dirección opuesta al atacante.");
+        Assert.Greater(rb.linearVelocity.x, 0f);
     }
 
-    // =========================================================================
-    // 4. No recibe knockback doble durante el hit-stun activo
-    //    El segundo golpe debe bajar la vida pero NO aplicar un segundo impulso
-    //    (ApplyHit retorna temprano mientras isHit == true).
-    // =========================================================================
+    // =========================
+    // TEST 4: HIT STUN
+    // =========================
+    /// <summary>
+    /// Verifica que durante el hit-stun el enemigo no recibe
+    /// un segundo knockback inmediatamente.
+    /// </summary>
     [UnityTest]
     public IEnumerator TakeDamage_SecondHitDuringHitStun_DoesNotApplyKnockbackAgain()
     {
@@ -126,61 +158,47 @@ public class EnemyHealthSystemTests
 
         Rigidbody2D rb = _enemyGO.GetComponent<Rigidbody2D>();
 
-        // Primer golpe: activa hit-stun y aplica impulso
         Vector2 attackerPos = new Vector2(-2f, 0f);
-        health.TakeDamage(10, attackerPos);
 
-        // Esperar un FixedUpdate para que el primer AddForce se procese
+        health.TakeDamage(10, attackerPos);
         yield return new WaitForFixedUpdate();
 
-        float velocityAfterFirstHit = rb.linearVelocity.x;
-
-        // Zerear velocidad manualmente para detectar si el segundo golpe añade fuerza
         rb.linearVelocity = Vector2.zero;
 
-        // Segundo golpe inmediato — hit-stun sigue activo, ApplyHit debe ignorarse
         health.TakeDamage(10, attackerPos);
-
         yield return new WaitForFixedUpdate();
 
-        // La velocidad debe seguir en cero: no se aplicó un segundo AddForce
-        Assert.AreEqual(0f, rb.linearVelocity.x, 0.001f,
-            "El segundo golpe durante el hit-stun no debe aplicar un impulso adicional.");
+        Assert.AreEqual(0f, rb.linearVelocity.x, 0.001f);
     }
 
-    // =========================================================================
-    // 5. El enemigo muere al llegar a 0 de vida
-    //    Die() hace Destroy(gameObject, 0.5 s); verificamos tras ese delay.
-    // =========================================================================
+    // =========================
+    // TEST 5: MUERTE DEL ENEMIGO
+    // =========================
+    /// <summary>
+    /// Verifica que el enemigo se destruye cuando su vida llega a 0.
+    /// </summary>
     [UnityTest]
     public IEnumerator TakeDamage_EnemyDiesWhenHealthReachesZero()
     {
         EnemyHealthSystem health = CreateEnemy();
         yield return null;
 
-        Vector2 attackerPos = new Vector2(_enemyGO.transform.position.x - 1f,
-                                          _enemyGO.transform.position.y);
+        Vector2 attackerPos = new Vector2(
+            _enemyGO.transform.position.x - 1f,
+            _enemyGO.transform.position.y
+        );
 
-        // Golpe letal: quita toda la vida de una vez
         health.TakeDamage(health.maxHealth, attackerPos);
 
-        // Confirmar que la vida llegó a cero antes de que el objeto sea destruido
-        Assert.AreEqual(0, health.currentHealth,
-            "La vida debe ser exactamente 0 tras un golpe letal.");
+        Assert.AreEqual(0, health.currentHealth);
 
-        // Die() destruye el GameObject con un delay de 0.5 s.
-        // Esperamos más que eso para verificar la destrucción.
-        // Se ignoran los mensajes de objetos destruidos que Unity puede emitir.
+        // Ignora logs de destrucción tardía de Unity
         LogAssert.ignoreFailingMessages = true;
         yield return new WaitForSeconds(0.7f);
         LogAssert.ignoreFailingMessages = false;
 
-        // Un GameObject destruido devuelve null en comparación con el operador ==
-        // de Unity (que sobrecarga == para objetos destruidos).
-        Assert.IsTrue(_enemyGO == null,
-            "El GameObject del enemigo debe haber sido destruido tras llegar a 0 de vida.");
+        Assert.IsTrue(_enemyGO == null);
 
-        // Limpiar la referencia para que TearDown no intente destruir un objeto ya destruido
         _enemyGO = null;
     }
 }

@@ -135,7 +135,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!212 &7778652
 SpriteRenderer:
   serializedVersion: 2
@@ -348,7 +348,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Hitbox
   attackName: Patada
   damage: 10
-  hitCooldown: 0.2
 --- !u!61 &112487828
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -659,7 +658,7 @@ Transform:
   m_GameObject: {fileID: 423295327}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.201, y: -0.03, z: 0}
+  m_LocalPosition: {x: 0.201, y: -0.03, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1101,7 +1100,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!212 &1047144152
 SpriteRenderer:
   serializedVersion: 2
@@ -1499,7 +1498,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: be361401a011de14c8e22da373977414, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1551,7 +1550,7 @@ Rigidbody2D:
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 3
-  m_Material: {fileID: 6200000, guid: be361401a011de14c8e22da373977414, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1576,7 +1575,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   speed: 5
   jumpForce: 10
-  canBeKnockedBack: 1
+  canBeKnockedBack: 0
   knockbackForce: 5
   knockbackDuration: 0.3
   wallCheckDistance: 0.2
@@ -1587,9 +1586,6 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  characterLayer:
-    serializedVersion: 2
-    m_Bits: 256
   wallCheck: {fileID: 421733124}
   boxCollider: {fileID: 1336044406}
   animator: {fileID: 1336044401}
@@ -1616,7 +1612,7 @@ MonoBehaviour:
   currentHealth: 100
   healthImage: {fileID: 1899710809}
   knockbackForce: 5
-  knockbackDuration: 0.05
+  knockbackDuration: 0.3
 --- !u!114 &1336044410
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1723,7 +1719,6 @@ GameObject:
   - component: {fileID: 1416566684}
   - component: {fileID: 1416566683}
   - component: {fileID: 1416566682}
-  - component: {fileID: 1416566691}
   - component: {fileID: 1416566694}
   m_Layer: 8
   m_Name: Duplicate
@@ -1757,9 +1752,6 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  characterLayer:
-    serializedVersion: 2
-    m_Bits: 128
   wallCheck: {fileID: 423295328}
   boxCollider: {fileID: 1416566687}
   animator: {fileID: 1416566685}
@@ -1838,10 +1830,10 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDamping: 0
+  m_LinearDamping: 1
   m_AngularDamping: 0.05
-  m_GravityScale: 3
-  m_Material: {fileID: 6200000, guid: be361401a011de14c8e22da373977414, type: 2}
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1850,7 +1842,7 @@ Rigidbody2D:
     m_Bits: 0
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 1
+  m_CollisionDetection: 0
   m_Constraints: 4
 --- !u!61 &1416566687
 BoxCollider2D:
@@ -1862,7 +1854,7 @@ BoxCollider2D:
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: be361401a011de14c8e22da373977414, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -1978,21 +1970,6 @@ Transform:
   - {fileID: 423295328}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1416566691
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1416566681}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 011a75f089af6ed47af9bb7da94727bd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnergySystem
-  maxEnergy: 100
-  currentEnergy: 0
-  energyImage: {fileID: 387685833}
 --- !u!114 &1416566694
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2006,10 +1983,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthSystem
   maxHealth: 100
-  currentHealth: 0
+  currentHealth: 50
   healthImage: {fileID: 875834188}
   knockbackForce: 5
-  knockbackDuration: 0.05
+  knockbackDuration: 0.3
 --- !u!1 &1440104677
 GameObject:
   m_ObjectHideFlags: 0
@@ -2058,7 +2035,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Hitbox
   attackName: Patada
   damage: 10
-  hitCooldown: 0.2
 --- !u!61 &1440104680
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2181,7 +2157,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Hitbox
   attackName: "Pu\xF1etazo"
   damage: 5
-  hitCooldown: 0.2
 --- !u!61 &1483370235
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2571,6 +2546,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1693811974}
+  - component: {fileID: 1693811975}
   m_Layer: 0
   m_Name: GroundCheck
   m_TagString: Untagged
@@ -2587,12 +2563,58 @@ Transform:
   m_GameObject: {fileID: 1693811973}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.145, y: -0.433, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: -0.017, y: -0.407, z: 0}
+  m_LocalScale: {x: 1.0088, y: 1.0088, z: 1.0088}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1416566689}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!61 &1693811975
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1693811973}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1, y: 1}
+  m_EdgeRadius: 0
 --- !u!1 &1864870129
 GameObject:
   m_ObjectHideFlags: 0
@@ -2641,7 +2663,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Hitbox
   attackName: "Pu\xF1etazo"
   damage: 5
-  hitCooldown: 0.2
 --- !u!61 &1864870132
 BoxCollider2D:
   m_ObjectHideFlags: 0

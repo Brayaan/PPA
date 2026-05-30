@@ -4,36 +4,53 @@ using UnityEngine;
 using UnityEngine.TestTools;
 
 /// <summary>
-/// Pruebas PlayMode para EnergySystem.
-/// Prueba omitida: actualización de UI de energía — depende de sprites externos
-/// cargados desde Resources y de una Image de Unity UI asignada en el Inspector.
-///
-/// LogAssert: EnergySystem.UpdateEnergyUI() lanza LogError("energyImage no está
-/// asignada en el Inspector") en CADA llamada porque energyImage es null en
-/// pruebas. Esto ocurre en:
-///   - Start()                    → primer yield return null de cada prueba.
-///   - GainEnergyFromDamage()     → llamada directa.
-///   - GainEnergyFromAttack()     → llamada directa.
-///   - GainEnergyFromBlock()      → llamada directa.
-///   - ConsumeEnergy()            → llamada directa.
-/// Se declara LogAssert.Expect antes de cada yield/llamada que lo dispara.
+/// TEST SUITE: EnergySystem
+/// 
+/// PROPÓSITO:
+/// Validar el sistema de energía del jugador en combate.
+/// 
+/// Este sistema controla cómo se gana y consume energía a través de:
+/// - Ataques (puñetazo, patada)
+/// - Recibir daño
+/// - Bloquear
+/// 
+/// También valida límites:
+/// - No puede superar el máximo de energía
+/// - No puede bajar de 0
+/// 
+/// DEPENDENCIA IMPORTANTE:
+/// EnergySystem depende de UI (energyImage), pero en tests se deja null.
+/// Esto genera LogError controlado que se ignora con LogAssert.
 /// </summary>
 public class EnergySystemTests
 {
+    // =========================
+    // REFERENCIA DEL JUGADOR
+    // =========================
     private GameObject _playerGO;
 
-    // -------------------------------------------------------------------------
-    // Helper: crea un GameObject con EnergySystem listo para pruebas.
-    // energyImage se deja null a propósito; UpdateEnergyUI() lo maneja con guard.
-    // -------------------------------------------------------------------------
+    // =========================
+    // HELPER: CREACIÓN DEL SISTEMA
+    // =========================
+    /// <summary>
+    /// Crea un jugador simulado con EnergySystem.
+    /// No se asigna UI intencionalmente (energyImage = null),
+    /// ya que no se está probando la interfaz.
+    /// </summary>
     private EnergySystem CreateEnergySystem()
     {
         _playerGO = new GameObject("TestPlayer");
         EnergySystem energy = _playerGO.AddComponent<EnergySystem>();
-        // energyImage null → UpdateEnergyUI() lanzará LogError gestionado con LogAssert
         return energy;
     }
 
+    // =========================
+    // TEARDOWN (LIMPIEZA)
+    // =========================
+    /// <summary>
+    /// Limpia el GameObject después de cada test
+    /// para evitar interferencia entre pruebas.
+    /// </summary>
     [TearDown]
     public void TearDown()
     {
@@ -41,141 +58,137 @@ public class EnergySystemTests
             Object.Destroy(_playerGO);
     }
 
-    // =========================================================================
-    // 1. Al golpear al enemigo sube la energía del atacante
-    //    GainEnergyFromAttack("Puñetazo") gana 5; GainEnergyFromAttack("Patada") gana 10.
-    // =========================================================================
+    // =========================
+    // TEST 1: GANANCIA POR ATAQUE
+    // =========================
+    /// <summary>
+    /// Verifica que diferentes ataques generan distinta cantidad de energía:
+    /// - Puñetazo → +5
+    /// - Patada → +10
+    /// - Desconocido → +0
+    /// </summary>
     [UnityTest]
     public IEnumerator GainEnergyFromAttack_IncreasesEnergyByCorrectAmount()
     {
         EnergySystem energy = CreateEnergySystem();
 
-        // Start() → UpdateEnergyUI() → LogError("energyImage...")
+        // Start del sistema → genera LogError por UI faltante
         LogAssert.Expect(LogType.Error, "energyImage no está asignada en el Inspector");
-        yield return null; // currentEnergy queda en 0 tras Start()
+        yield return null;
 
-        // --- Puñetazo: +5 ---
-        int before = energy.currentEnergy; // 0
+        int before = energy.currentEnergy;
+
+        // Puñetazo
         LogAssert.Expect(LogType.Error, "energyImage no está asignada en el Inspector");
         energy.GainEnergyFromAttack("Puñetazo");
 
-        Assert.AreEqual(before + 5, energy.currentEnergy,
-            "GainEnergyFromAttack('Puñetazo') debe incrementar currentEnergy en 5.");
+        Assert.AreEqual(before + 5, energy.currentEnergy);
 
-        // --- Patada: +10 ---
-        before = energy.currentEnergy; // 5
+        before = energy.currentEnergy;
+
+        // Patada
         LogAssert.Expect(LogType.Error, "energyImage no está asignada en el Inspector");
         energy.GainEnergyFromAttack("Patada");
 
-        Assert.AreEqual(before + 10, energy.currentEnergy,
-            "GainEnergyFromAttack('Patada') debe incrementar currentEnergy en 10.");
+        Assert.AreEqual(before + 10, energy.currentEnergy);
 
-        // --- Nombre desconocido: +0 ---
-        before = energy.currentEnergy; // 15
+        before = energy.currentEnergy;
+
+        // Ataque desconocido
         LogAssert.Expect(LogType.Error, "energyImage no está asignada en el Inspector");
         energy.GainEnergyFromAttack("Desconocido");
 
-        Assert.AreEqual(before, energy.currentEnergy,
-            "GainEnergyFromAttack con nombre desconocido no debe cambiar currentEnergy.");
+        Assert.AreEqual(before, energy.currentEnergy);
     }
 
-    // =========================================================================
-    // 2. Al recibir daño sube la energía del receptor
-    //    GainEnergyFromDamage() suma 2 por llamada.
-    // =========================================================================
+    // =========================
+    // TEST 2: DAÑO RECIBIDO
+    // =========================
+    /// <summary>
+    /// Verifica que recibir daño también genera energía (+2).
+    /// </summary>
     [UnityTest]
     public IEnumerator GainEnergyFromDamage_IncreasesEnergyByTwo()
     {
         EnergySystem energy = CreateEnergySystem();
 
-        // Start() → UpdateEnergyUI() → LogError
         LogAssert.Expect(LogType.Error, "energyImage no está asignada en el Inspector");
         yield return null;
 
-        int before = energy.currentEnergy; // 0
+        int before = energy.currentEnergy;
 
-        // GainEnergyFromDamage() → UpdateEnergyUI() → LogError
         LogAssert.Expect(LogType.Error, "energyImage no está asignada en el Inspector");
         energy.GainEnergyFromDamage();
 
-        Assert.AreEqual(before + 2, energy.currentEnergy,
-            "GainEnergyFromDamage() debe incrementar currentEnergy en 2.");
-        Assert.Greater(energy.currentEnergy, 0,
-            "La energía debe ser mayor que cero tras recibir daño.");
+        Assert.AreEqual(before + 2, energy.currentEnergy);
+        Assert.Greater(energy.currentEnergy, 0);
     }
 
-    // =========================================================================
-    // 3. Al bloquear sube la energía
-    //    GainEnergyFromBlock() suma 3 por activación.
-    // =========================================================================
+    // =========================
+    // TEST 3: BLOQUEO
+    // =========================
+    /// <summary>
+    /// Verifica que bloquear genera energía (+3).
+    /// </summary>
     [UnityTest]
     public IEnumerator GainEnergyFromBlock_IncreasesEnergyByThree()
     {
         EnergySystem energy = CreateEnergySystem();
 
-        // Start() → UpdateEnergyUI() → LogError
         LogAssert.Expect(LogType.Error, "energyImage no está asignada en el Inspector");
         yield return null;
 
-        int before = energy.currentEnergy; // 0
+        int before = energy.currentEnergy;
 
-        // GainEnergyFromBlock() → UpdateEnergyUI() → LogError
         LogAssert.Expect(LogType.Error, "energyImage no está asignada en el Inspector");
         energy.GainEnergyFromBlock();
 
-        Assert.AreEqual(before + 3, energy.currentEnergy,
-            "GainEnergyFromBlock() debe incrementar currentEnergy en 3.");
-        Assert.IsTrue(energy.currentEnergy > 0,
-            "La energía debe ser mayor que cero tras activar el bloqueo.");
+        Assert.AreEqual(before + 3, energy.currentEnergy);
+        Assert.IsTrue(energy.currentEnergy > 0);
     }
 
-    // =========================================================================
-    // 4. La energía no supera maxEnergy (100)
-    //    Si currentEnergy + ganancia > maxEnergy, queda clampeada en maxEnergy.
-    // =========================================================================
+    // =========================
+    // TEST 4: LÍMITE MÁXIMO
+    // =========================
+    /// <summary>
+    /// Verifica que la energía no puede superar maxEnergy.
+    /// </summary>
     [UnityTest]
     public IEnumerator Energy_DoesNotExceedMaxEnergy()
     {
         EnergySystem energy = CreateEnergySystem();
 
-        // Start() → UpdateEnergyUI() → LogError
         LogAssert.Expect(LogType.Error, "energyImage no está asignada en el Inspector");
         yield return null;
 
-        // Llevar currentEnergy casi al límite manualmente (campo público)
-        energy.currentEnergy = energy.maxEnergy - 1; // 99
+        // Colocar energía cerca del máximo
+        energy.currentEnergy = energy.maxEnergy - 1;
 
-        // GainEnergyFromAttack("Patada") intenta sumar 10 → debería clampear a 100
         LogAssert.Expect(LogType.Error, "energyImage no está asignada en el Inspector");
         energy.GainEnergyFromAttack("Patada");
 
-        Assert.AreEqual(energy.maxEnergy, energy.currentEnergy,
-            "currentEnergy no debe superar maxEnergy aunque la ganancia lo exceda.");
-        Assert.IsTrue(energy.IsFull(),
-            "IsFull() debe devolver true cuando currentEnergy == maxEnergy.");
+        Assert.AreEqual(energy.maxEnergy, energy.currentEnergy);
+        Assert.IsTrue(energy.IsFull());
     }
 
-    // =========================================================================
-    // 5. La energía no baja de 0
-    //    ConsumeEnergy() clampea currentEnergy a 0 si el consumo es excesivo.
-    // =========================================================================
+    // =========================
+    // TEST 5: LÍMITE MÍNIMO
+    // =========================
+    /// <summary>
+    /// Verifica que la energía nunca baja de 0.
+    /// </summary>
     [UnityTest]
     public IEnumerator Energy_DoesNotGoBelowZero()
     {
         EnergySystem energy = CreateEnergySystem();
 
-        // Start() → UpdateEnergyUI() → LogError
         LogAssert.Expect(LogType.Error, "energyImage no está asignada en el Inspector");
         yield return null;
 
-        // currentEnergy empieza en 0 tras Start(); consumir más de lo disponible
-        // ConsumeEnergy() → UpdateEnergyUI() → LogError
         LogAssert.Expect(LogType.Error, "energyImage no está asignada en el Inspector");
         energy.ConsumeEnergy(energy.maxEnergy + 50);
 
-        Assert.AreEqual(0, energy.currentEnergy,
-            "currentEnergy no debe bajar de cero aunque el consumo sea excesivo.");
-        Assert.IsFalse(energy.IsFull(),
-            "IsFull() debe devolver false cuando currentEnergy es 0.");
+        Assert.AreEqual(0, energy.currentEnergy);
+        Assert.IsFalse(energy.IsFull());
     }
 }

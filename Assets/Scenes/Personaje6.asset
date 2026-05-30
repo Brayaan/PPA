@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c95cbc1db6965e64a8c1165a3e07a59a, type: 3}
+  m_Name: Personaje6
+  m_EditorClassIdentifier: GameAssembly::CharacterData
+  characterName: Kitsune
+  idleAnimation:
+  - {fileID: 4944230376442633554, guid: feb16d61cef11004faa1d984af91fb86, type: 3}
+  - {fileID: -2274363484027164459, guid: feb16d61cef11004faa1d984af91fb86, type: 3}
+  - {fileID: 8284087734974297348, guid: feb16d61cef11004faa1d984af91fb86, type: 3}
+  - {fileID: 5304202850863732263, guid: feb16d61cef11004faa1d984af91fb86, type: 3}
+  - {fileID: 2833043080597125133, guid: feb16d61cef11004faa1d984af91fb86, type: 3}
+  - {fileID: -2217414122262695004, guid: feb16d61cef11004faa1d984af91fb86, type: 3}
+  - {fileID: -4440497016933152808, guid: feb16d61cef11004faa1d984af91fb86, type: 3}
+  - {fileID: 8676454946275842879, guid: feb16d61cef11004faa1d984af91fb86, type: 3}
+  - {fileID: -8915327726919978405, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: 4416717768442454902, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: -8053095777402275025, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: 4688295478533005478, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: 3156989228384878200, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: -4176445809780997858, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: 9111255474114485651, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: -6197699949570948299, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: 5610570195965040114, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: -4186573142144889428, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: -6449648367012705641, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: -9080296470528153068, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: 549843493828548186, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: -1949197173246352631, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: 8661367325605615837, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: 5279893943038032714, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: -8098450456456241304, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: -5964631490132687288, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: 1041346128526885044, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: 8971151442190097498, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: -7284276865116135648, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: -5920049745647856285, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: 1501608984118140601, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  - {fileID: 2287586033297064399, guid: 9a63074cbb17ea14b98265b1d6d8f214, type: 3}
+  animationSpeed: 0.1
+  description: "Esp\xEDritu m\xEDstico de m\xFAltiples colas capaz de enga\xF1ar
+    a cualquiera. Usa ilusiones y magia ancestral para confundir a sus enemigos."
+  characterPrefab: {fileID: 0}

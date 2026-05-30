@@ -17,18 +17,21 @@ public class Hitbox : MonoBehaviour
         if (attack == null || !attack.IsAttacking() || !gameObject.activeSelf)
             return;
 
-        if (other.CompareTag("Player") || other.CompareTag("Enemy"))
+        if (other.transform.root.CompareTag("Player") || other.transform.root.CompareTag("Enemy"))
         {
             // Evitar que el hitbox golpee al propio personaje
-            if (other.gameObject == transform.root.gameObject)
+            if (other.transform.root == transform.root)
                 return;
 
-            PlayerDefense defense = other.GetComponent<PlayerDefense>();
+            PlayerDefense defense = other.GetComponentInParent<PlayerDefense>();
 
             // Si el objetivo bloquea, empujar al atacante de vuelta
             if (defense != null && defense.IsBlocking())
             {
                 Debug.Log(other.name + " bloqueó el ataque");
+                
+                // CA-03: Sonido de bloqueo
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayBlockSound();
 
                 Rigidbody2D attackerRb = transform.root.GetComponent<Rigidbody2D>();
 
@@ -44,7 +47,7 @@ public class Hitbox : MonoBehaviour
                 return;
             }
 
-            HealthSystem health = other.GetComponent<HealthSystem>();
+            HealthSystem health = other.GetComponentInParent<HealthSystem>();
 
             if (health != null)
             {
@@ -58,8 +61,11 @@ public class Hitbox : MonoBehaviour
 
                 health.TakeDamage(damage, attackerPosition);
 
+                // CA-01: Sonido de impacto (Puño o Patada)
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayHitSound(attackName);
+
                 // Dar energía al objetivo por absorber el impacto
-                EnergySystem targetEnergy = other.GetComponent<EnergySystem>();
+                EnergySystem targetEnergy = other.GetComponentInParent<EnergySystem>();
                 if (targetEnergy != null)
                     targetEnergy.GainEnergyFromDamage();
 

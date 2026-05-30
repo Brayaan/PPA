@@ -9,7 +9,6 @@ public class EnemyHealthSystem : MonoBehaviour
     public float knockbackDuration = 0.3f;
 
     private Rigidbody2D rb;
-    // Previene stacking de knockback durante el hit-stun
     private bool isHit = false;
 
     void Start()
@@ -22,7 +21,6 @@ public class EnemyHealthSystem : MonoBehaviour
     {
         currentHealth -= damage;
 
-        // Clampear vida para no bajar de cero
         if (currentHealth < 0)
             currentHealth = 0;
 
@@ -30,28 +28,24 @@ public class EnemyHealthSystem : MonoBehaviour
 
         ApplyHit(attackerPosition);
 
-        // Verificar muerte después de aplicar el golpe
         if (currentHealth <= 0)
             Die();
     }
 
     void ApplyHit(Vector2 attackerPosition)
     {
-        // Ignorar golpe si el hit-stun aún está activo
         if (isHit) return;
 
         isHit = true;
 
-        // Dirección del empuje opuesta al atacante
         Vector2 direction = (transform.position - (Vector3)attackerPosition).normalized;
 
         if (rb != null)
         {
-            rb.linearVelocity = Vector2.zero;
-            rb.AddForce(new Vector2(direction.x * knockbackForce, 2f), ForceMode2D.Impulse);
+            rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
+            rb.AddForce(new Vector2(direction.x * knockbackForce, 0f), ForceMode2D.Impulse);
         }
 
-        // Mathf.Max evita que duration negativo colapse el cooldown
         Invoke(nameof(EndHit), Mathf.Max(0f, knockbackDuration));
     }
 
@@ -63,7 +57,6 @@ public class EnemyHealthSystem : MonoBehaviour
     void Die()
     {
         Debug.Log("Enemigo derrotado");
-        // Delay para permitir efectos visuales antes de destruir
         Destroy(gameObject, 0.5f);
     }
 }

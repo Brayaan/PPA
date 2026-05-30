@@ -25,6 +25,14 @@ public class ExtendedHitbox : MonoBehaviour
         if (other.CompareTag("Enemy"))
         {
             EnemyHealthSystem enemyHealth = other.GetComponent<EnemyHealthSystem>();
+            PlayerDefense defense = other.GetComponentInParent<PlayerDefense>();
+
+            if (defense != null && defense.IsBlocking())
+            {
+                Debug.Log("Ataque bloqueado por " + other.name);
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayBlockSound();
+                return;
+            }
 
             if (enemyHealth != null)
             {
@@ -33,6 +41,8 @@ public class ExtendedHitbox : MonoBehaviour
                 int damage = originalHitbox.damage;
 
                 enemyHealth.TakeDamage(damage, attackerPosition);
+                
+                if (AudioManager.Instance != null) AudioManager.Instance.PlayHitSound(originalHitbox.attackName);
 
                 // Dar energía al atacante por conectar el golpe
                 EnergySystem attackerEnergy = transform.root.GetComponent<EnergySystem>();

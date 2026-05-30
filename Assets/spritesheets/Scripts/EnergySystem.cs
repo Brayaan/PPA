@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class EnergySystem : MonoBehaviour
 {
-    public int maxEnergy = 100;
+    public int maxEnergy = 0;
     public int currentEnergy;
 
     public Image energyImage;
@@ -69,11 +69,15 @@ public class EnergySystem : MonoBehaviour
             return;
         }
 
-        // Calcular índice e invertir: sprite 0 = lleno
+        // Calcular índice: 0 = vacío, último = lleno. Invertimos porque el sprite 0 es el lleno.
         int index = Mathf.RoundToInt(((float)currentEnergy / maxEnergy) * (energySprites.Length - 1));
         index = Mathf.Clamp(index, 0, energySprites.Length - 1);
+        
         index = (energySprites.Length - 1) - index;
+        
         energyImage.sprite = energySprites[index];
+        energyImage.enabled = true;
+        energyImage.color = Color.white;
     }
 
     public bool IsFull()

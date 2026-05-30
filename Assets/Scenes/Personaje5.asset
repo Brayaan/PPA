@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c95cbc1db6965e64a8c1165a3e07a59a, type: 3}
+  m_Name: Personaje5
+  m_EditorClassIdentifier: GameAssembly::CharacterData
+  characterName: Minotaur
+  idleAnimation:
+  - {fileID: 4035959289877228764, guid: adfa018b93949864fbfc1d2727273db4, type: 3}
+  - {fileID: -982904232830982447, guid: adfa018b93949864fbfc1d2727273db4, type: 3}
+  - {fileID: -350908408369970039, guid: adfa018b93949864fbfc1d2727273db4, type: 3}
+  - {fileID: -5409570386352685021, guid: adfa018b93949864fbfc1d2727273db4, type: 3}
+  - {fileID: 1553940418269799609, guid: adfa018b93949864fbfc1d2727273db4, type: 3}
+  - {fileID: 2416434504916517810, guid: adfa018b93949864fbfc1d2727273db4, type: 3}
+  - {fileID: -6428935122508569504, guid: adfa018b93949864fbfc1d2727273db4, type: 3}
+  - {fileID: 7144598999076838305, guid: adfa018b93949864fbfc1d2727273db4, type: 3}
+  - {fileID: 7500509103958437945, guid: adfa018b93949864fbfc1d2727273db4, type: 3}
+  - {fileID: 1008816216748069464, guid: adfa018b93949864fbfc1d2727273db4, type: 3}
+  - {fileID: 11406907883527339, guid: adfa018b93949864fbfc1d2727273db4, type: 3}
+  - {fileID: 8030128826893041618, guid: adfa018b93949864fbfc1d2727273db4, type: 3}
+  - {fileID: -7008412969330441016, guid: d0a86cf83691e624f86578f2068376b0, type: 3}
+  - {fileID: -7763475090823894447, guid: d0a86cf83691e624f86578f2068376b0, type: 3}
+  - {fileID: 302641331129538988, guid: d0a86cf83691e624f86578f2068376b0, type: 3}
+  - {fileID: -6329420634031446844, guid: d0a86cf83691e624f86578f2068376b0, type: 3}
+  - {fileID: -910092549403018386, guid: d0a86cf83691e624f86578f2068376b0, type: 3}
+  - {fileID: 221524225039350300, guid: d0a86cf83691e624f86578f2068376b0, type: 3}
+  animationSpeed: 0.1
+  description: Gigante de fuerza monstruosa y resistencia legendaria. Cada paso suyo
+    hace temblar el campo de batalla.
+  characterPrefab: {fileID: 0}

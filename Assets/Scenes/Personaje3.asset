@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c95cbc1db6965e64a8c1165a3e07a59a, type: 3}
+  m_Name: Personaje3
+  m_EditorClassIdentifier: GameAssembly::CharacterData
+  characterName: Samurai_Commander
+  idleAnimation:
+  - {fileID: -8915327726919978405, guid: c84f4d74c40ead14ba98200062e79ae2, type: 3}
+  - {fileID: 4416717768442454902, guid: c84f4d74c40ead14ba98200062e79ae2, type: 3}
+  - {fileID: -8053095777402275025, guid: c84f4d74c40ead14ba98200062e79ae2, type: 3}
+  - {fileID: 4688295478533005478, guid: c84f4d74c40ead14ba98200062e79ae2, type: 3}
+  - {fileID: 3156989228384878200, guid: c84f4d74c40ead14ba98200062e79ae2, type: 3}
+  - {fileID: -837275676153275556, guid: ab3e7fb4b7c20794f986d4821ebbc30b, type: 3}
+  - {fileID: -8404040051688745268, guid: ab3e7fb4b7c20794f986d4821ebbc30b, type: 3}
+  - {fileID: -3526194569594660169, guid: ab3e7fb4b7c20794f986d4821ebbc30b, type: 3}
+  - {fileID: 950650993592285724, guid: ab3e7fb4b7c20794f986d4821ebbc30b, type: 3}
+  - {fileID: 6371639423800154214, guid: ab3e7fb4b7c20794f986d4821ebbc30b, type: 3}
+  - {fileID: 3517966781153112992, guid: ab3e7fb4b7c20794f986d4821ebbc30b, type: 3}
+  - {fileID: -8910899737472627771, guid: 945643ebe9253a3469dd3641fbe9e652, type: 3}
+  - {fileID: -5464336490339650859, guid: 945643ebe9253a3469dd3641fbe9e652, type: 3}
+  - {fileID: -1132038362817505424, guid: 945643ebe9253a3469dd3641fbe9e652, type: 3}
+  - {fileID: -6574224857763752514, guid: 945643ebe9253a3469dd3641fbe9e652, type: 3}
+  - {fileID: -6827800710642968084, guid: 945643ebe9253a3469dd3641fbe9e652, type: 3}
+  - {fileID: 5388459929022106953, guid: 945643ebe9253a3469dd3641fbe9e652, type: 3}
+  animationSpeed: 0.1
+  description: Veterano de incontables guerras. Lidera con honor y domina el combate
+    con disciplina, estrategia y fuerza imparable.
+  characterPrefab: {fileID: 0}

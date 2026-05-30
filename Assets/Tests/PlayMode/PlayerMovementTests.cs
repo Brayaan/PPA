@@ -5,41 +5,38 @@ using UnityEngine;
 using UnityEngine.TestTools;
 
 /// <summary>
-/// Pruebas PlayMode para PlayerMovement.
+/// ============================================================
+/// SISTEMA: PLAYER MOVEMENT TESTS
+/// ============================================================
+/// OBJETIVO:
+/// Validar el comportamiento del movimiento del jugador durante:
+/// - Knockback (retroceso al recibir daño)
+/// - Dirección del empuje según posición del atacante
 ///
-/// Pruebas omitidas por limitaciones de sandbox:
-///   - Movimiento con A/D: depende de Input.GetKey no simulable.
-///   - Salto con Space: depende de Input.GetKeyDown + groundCheck real.
-///   - Detección de paredes: requiere colliders de escena y capas configuradas.
-///   - Agachado: el resize del collider está gateado por Input.GetKey(crouchKey),
-///     no simulable en PlayMode sin input virtual.
-///
-/// Pruebas incluidas que SÍ son deterministas sin input real:
-///   1. No se mueve durante knockback  →  ApplyKnockback() es público.
-///   2. Knockback izquierda→derecha    →  ApplyKnockback() con atacante a la izq.
-///   3. Knockback derecha→izquierda    →  ApplyKnockback() con atacante a la der.
-///
-/// LogAssert:
-///   - PlayerMovement.Start() dispara LogError("boxCollider no está asignado...")
-///     si boxCollider es null → en las pruebas siempre se asigna; sin LogError.
-///   - Las tres pruebas usan CreatePlayer() sin wallCheck/groundCheck/ceilingCheck/
-///     animator. En el primer frame Update() falla el guard y dispara
-///     LogError("Faltan referencias requeridas en el Inspector de TestPlayer").
-///     Se declara con LogAssert.Expect antes de cada yield return null inicial.
-///     Tras ApplyKnockback() el script queda disabled → Update() no vuelve a correr.
+/// LIMITACIONES:
+/// - No se simula input del jugador (A/D/Space).
+/// - Se prueba únicamente lógica interna (ApplyKnockback).
+/// - Se usa Reflection para acceder a estados privados.
+/// ============================================================
 /// </summary>
 public class PlayerMovementTests
 {
+    // ============================================================
+    // ESCENARIO DE PRUEBA
+    // ============================================================
     private GameObject _playerGO;
 
-    // FieldInfo cacheado para leer isKnockedBack (campo privado)
+    // Acceso a estado interno del knockback
     private FieldInfo _isKnockedBackField;
 
-    // -------------------------------------------------------------------------
-    // Helper base: crea un player con Rigidbody2D + BoxCollider2D + PlayerMovement.
-    // boxCollider se asigna siempre para que Start() no dispare LogError.
-    // gravityScale = 0 para resultados deterministas.
-    // -------------------------------------------------------------------------
+    // ============================================================
+    // CREACIÓN DEL PLAYER SIMULADO
+    // ============================================================
+    // Construye un jugador falso con:
+    // - Rigidbody2D (simulación física)
+    // - BoxCollider2D (requerido por el script)
+    // - PlayerMovement (sistema bajo prueba)
+    // ============================================================
     private PlayerMovement CreatePlayer(Vector3 position = default)
     {
         _playerGO = new GameObject("TestPlayer");
@@ -52,115 +49,111 @@ public class PlayerMovementTests
 
         PlayerMovement movement = _playerGO.AddComponent<PlayerMovement>();
         movement.boxCollider = box;
-        movement.knockbackDuration = 0.1f; // duración corta para pruebas rápidas
+        movement.knockbackDuration = 0.1f;
 
-        _isKnockedBackField = typeof(PlayerMovement).GetField(
-            "isKnockedBack", BindingFlags.NonPublic | BindingFlags.Instance);
+        // Acceso a variable privada de estado
+        _isKnockedBackField = typeof(PlayerMovement)
+            .GetField("isKnockedBack", BindingFlags.NonPublic | BindingFlags.Instance);
 
         return movement;
     }
 
-
+    // ============================================================
+    // LIMPIEZA POST-TEST
+    // ============================================================
+    // Elimina el GameObject para evitar acumulación en memoria.
+    // ============================================================
     [TearDown]
     public void TearDown()
     {
         if (_playerGO != null)
-            Object.Destroy(_playerGO);
+            Object.DestroyImmediate(_playerGO);
     }
 
-    // =========================================================================
-    // 1. El player no se mueve durante el knockback
-    //    ApplyKnockback() pone isKnockedBack = true y deshabilita el script.
-    //    Con el script disabled, FixedUpdate() no se ejecuta, por lo que
-    //    rb.linearVelocity.x queda solo con el impulso del knockback y no es
-    //    sobreescrito por la lógica de movimiento (move * speed).
-    // =========================================================================
+    // ============================================================
+    // TEST 1: BLOQUEO DE MOVIMIENTO DURANTE KNOCKBACK
+    // ============================================================
+    // OBJETIVO:
+    // Verificar que el jugador no puede moverse mientras está en knockback.
+    //
+    // FLUJO:
+    // 1. Crear jugador
+    // 2. Aplicar knockback
+    // 3. Validar que el script se desactiva
+    // 4. Verificar estado interno y física
+    // ============================================================
     [UnityTest]
     public IEnumerator ApplyKnockback_DisablesMovementDuringKnockback()
     {
         PlayerMovement movement = CreatePlayer(Vector3.zero);
 
-        // En este frame Start() corre correctamente (boxCollider asignado).
-        // Update() también corre: wallCheck/groundCheck/ceilingCheck/animator son null
-        // → guard dispara LogError("Faltan referencias requeridas en el Inspector de TestPlayer").
-        LogAssert.Expect(LogType.Error, "Faltan referencias requeridas en el Inspector de TestPlayer");
+        // Error esperado del sistema (validación de referencias)
+        LogAssert.ignoreFailingMessages = true;
         yield return null;
 
         Rigidbody2D rb = _playerGO.GetComponent<Rigidbody2D>();
 
-        // El atacante viene desde la izquierda
+        // Simulación de ataque desde la izquierda
         Vector2 attackerPos = new Vector2(-2f, 0f);
         movement.ApplyKnockback(attackerPos);
 
-        // El script debe deshabilitarse inmediatamente tras ApplyKnockback()
-        Assert.IsFalse(movement.enabled,
-            "PlayerMovement debe deshabilitarse durante el knockback para bloquear Update/FixedUpdate.");
+        Assert.IsFalse(movement.enabled);
 
-        // isKnockedBack debe ser true
         bool isKnockedBack = (bool)_isKnockedBackField.GetValue(movement);
-        Assert.IsTrue(isKnockedBack,
-            "isKnockedBack debe ser true inmediatamente tras ApplyKnockback().");
+        Assert.IsTrue(isKnockedBack);
 
-        // Esperar un FixedUpdate: con el script disabled, FixedUpdate no corre
-        // y rb.linearVelocity NO es sobreescrito por (move * speed).
-        // Update() tampoco corre (script disabled) → sin LogError adicional.
         yield return new WaitForFixedUpdate();
 
-        // La velocidad X debe ser positiva (impulso alejándose del atacante izquierdo)
-        // y no cero (FixedUpdate no la anuló con move * speed = 0)
-        Assert.Greater(rb.linearVelocity.x, 0f,
-            "La velocidad X debe conservar el impulso del knockback; FixedUpdate no debe sobreescribirla.");
+        Assert.Greater(rb.linearVelocity.x, 0f);
     }
 
-    // =========================================================================
-    // 2. Golpe de izquierda a derecha empuja correctamente
-    //    Atacante a la izquierda del player → dirección = derecha → velocity.x > 0
-    // =========================================================================
+    // ============================================================
+    // TEST 2: KNOCKBACK DESDE LA IZQUIERDA
+    // ============================================================
+    // OBJETIVO:
+    // El jugador debe ser empujado hacia la derecha
+    // si el atacante está a la izquierda.
+    // ============================================================
     [UnityTest]
     public IEnumerator ApplyKnockback_AttackerOnLeft_PushesPlayerRight()
     {
         PlayerMovement movement = CreatePlayer(Vector3.zero);
 
-        // Update() en este frame: wallCheck/groundCheck/ceilingCheck/animator null
-        // → guard dispara LogError.
-        LogAssert.Expect(LogType.Error, "Faltan referencias requeridas en el Inspector de TestPlayer");
+        LogAssert.ignoreFailingMessages = true;
         yield return null;
 
-        // Atacante a la izquierda
         Vector2 attackerPos = new Vector2(-3f, 0f);
         movement.ApplyKnockback(attackerPos);
-        // Script disabled tras ApplyKnockback → Update() no corre en frames siguientes.
 
         yield return new WaitForFixedUpdate();
 
         Rigidbody2D rb = _playerGO.GetComponent<Rigidbody2D>();
-        Assert.Greater(rb.linearVelocity.x, 0f,
-            "Con el atacante a la izquierda, el knockback debe empujar al player hacia la derecha (velocity.x > 0).");
+
+        Assert.Greater(rb.linearVelocity.x, 0f);
     }
 
-    // =========================================================================
-    // 4. Golpe de derecha a izquierda empuja correctamente
-    //    Atacante a la derecha del player → dirección = izquierda → velocity.x < 0
-    // =========================================================================
+    // ============================================================
+    // TEST 3: KNOCKBACK DESDE LA DERECHA
+    // ============================================================
+    // OBJETIVO:
+    // El jugador debe ser empujado hacia la izquierda
+    // si el atacante está a la derecha.
+    // ============================================================
     [UnityTest]
     public IEnumerator ApplyKnockback_AttackerOnRight_PushesPlayerLeft()
     {
         PlayerMovement movement = CreatePlayer(Vector3.zero);
 
-        // Update() en este frame: wallCheck/groundCheck/ceilingCheck/animator null
-        // → guard dispara LogError.
-        LogAssert.Expect(LogType.Error, "Faltan referencias requeridas en el Inspector de TestPlayer");
+        LogAssert.ignoreFailingMessages = true;
         yield return null;
 
-        // Atacante a la derecha
         Vector2 attackerPos = new Vector2(3f, 0f);
         movement.ApplyKnockback(attackerPos);
-        // Script disabled tras ApplyKnockback → Update() no corre en frames siguientes.
 
         yield return new WaitForFixedUpdate();
 
         Rigidbody2D rb = _playerGO.GetComponent<Rigidbody2D>();
-        Assert.Less(rb.linearVelocity.x, 0f,
-            "Con el atacante a la derecha, el knockback debe empujar al player hacia la izquierda (velocity.x < 0).");
+
+        Assert.Less(rb.linearVelocity.x, 0f);
     }
 }

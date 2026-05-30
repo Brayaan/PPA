@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c95cbc1db6965e64a8c1165a3e07a59a, type: 3}
+  m_Name: Personaje2
+  m_EditorClassIdentifier: GameAssembly::CharacterData
+  characterName: Kunoichi
+  idleAnimation:
+  - {fileID: -8915327726919978405, guid: 8239c1810a4a01847bc6a4b14a1ea64f, type: 3}
+  - {fileID: 4416717768442454902, guid: 8239c1810a4a01847bc6a4b14a1ea64f, type: 3}
+  - {fileID: -8053095777402275025, guid: 8239c1810a4a01847bc6a4b14a1ea64f, type: 3}
+  - {fileID: 4688295478533005478, guid: 8239c1810a4a01847bc6a4b14a1ea64f, type: 3}
+  - {fileID: 3156989228384878200, guid: 8239c1810a4a01847bc6a4b14a1ea64f, type: 3}
+  - {fileID: -4176445809780997858, guid: 8239c1810a4a01847bc6a4b14a1ea64f, type: 3}
+  - {fileID: -837275676153275556, guid: e1612874a64b4394ba9a478621dda144, type: 3}
+  - {fileID: -8404040051688745268, guid: e1612874a64b4394ba9a478621dda144, type: 3}
+  - {fileID: -3526194569594660169, guid: e1612874a64b4394ba9a478621dda144, type: 3}
+  - {fileID: 950650993592285724, guid: e1612874a64b4394ba9a478621dda144, type: 3}
+  - {fileID: 6371639423800154214, guid: e1612874a64b4394ba9a478621dda144, type: 3}
+  - {fileID: 3517966781153112992, guid: e1612874a64b4394ba9a478621dda144, type: 3}
+  - {fileID: -7018801485362641992, guid: e1612874a64b4394ba9a478621dda144, type: 3}
+  - {fileID: -4083314108108747639, guid: e1612874a64b4394ba9a478621dda144, type: 3}
+  animationSpeed: 0.1
+  description: Silenciosa, veloz y mortal. Una asesina entrenada en las sombras que
+    elimina objetivos antes de ser vista.
+  characterPrefab: {fileID: 0}
